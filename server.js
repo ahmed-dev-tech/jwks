@@ -128,7 +128,10 @@ router.post("/verify/ec", async (req, res) => {
     res.send({ error: e });
   }
 });
-const port = 3000;
+const port = process.env.PORT || 3000;
+
+router.get("*", (req, res) => res.end("Hello"));
+
 router.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on ${port}`);
 });
