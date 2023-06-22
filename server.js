@@ -52,13 +52,14 @@ router.get("/rotate/rsa", async (req, res) => {
   res.send("RSA Key Rotated");
 });
 
-router.get("/.well-known/keys.json", async (req, res) => {
+// router.get("/.well-known/keys.json", async (req, res) => {
+router.get("/jwks/rsa", async (req, res) => {
   const ks = fs.readFileSync("keys_ec.json");
   const keyStore = await jose.JWK.asKeyStore(ks.toString());
   res.send(keyStore.toJSON());
 });
 
-router.get("/jwks/rsa", async (req, res) => {
+router.get("/.well-known/keys.json", async (req, res) => {
   const ks = fs.readFileSync("keys_rsa.json");
   const keyStore = await jose.JWK.asKeyStore(ks.toString());
 
@@ -94,8 +95,8 @@ router.get("/token/rsa", async (req, res) => {
 
   const opt = { compact: true, jwk: key, fields: { typ: "jwt" } };
   const payload = JSON.stringify({
-    sub: "apigee-test-subject",
-    aud: "apigee-test-aud",
+    sub: "123",
+    aud: "urn:zerodev:client",
   });
   const token = await jose.JWS.createSign(opt, key).update(payload).final();
   res.send({ token });
