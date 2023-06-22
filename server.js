@@ -103,7 +103,9 @@ router.get("/token/rsa", async (req, res) => {
 
 router.post("/verify/rsa", async (req, res) => {
   const { token } = req.body;
-  const { data } = await axios.get("http://localhost:3000/jwks/rsa");
+  const { data } = await axios.get(
+    "https://jwks-production.up.railway.app/jwks/rsa"
+  );
   const [firstKey] = data.keys;
   const publicKey = jwktopem(firstKey);
   try {
@@ -117,7 +119,7 @@ router.post("/verify/rsa", async (req, res) => {
 router.post("/verify/ec", async (req, res) => {
   const { token } = req.body;
   const { data } = await axios.get(
-    "http://localhost:3000/.well-known/keys.json"
+    "https://jwks-production.up.railway.app/.well-known/keys.json"
   );
   const [firstKey] = data.keys;
   const publicKey = jwktopem(firstKey);
