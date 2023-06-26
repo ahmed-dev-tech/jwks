@@ -88,12 +88,13 @@ router.get("/token/ec", async (req, res) => {
   res.send({ token });
 });
 
-router.get("/token/rsa", async (req, res) => {
+router.get("/token/rsa/:userID", async (req, res) => {
+  const { userID } = req.params;
   const ks = fs.readFileSync("keys_rsa.json"); // replace this with your JWKS endpoint in case of RSA
   const keyStore = await jose.JWK.asKeyStore(ks.toString());
   const [key] = keyStore.all({ use: "sig" });
 
-  const opt = { compact: true, jwk: key, fields: { typ: "jwt" } };
+  const opt = { compact: true, jwk: key, fields: { typ: "jwt" }, userID };
   const payload = JSON.stringify({
     sub: "123",
     aud: "urn:zerodev:client",
