@@ -88,19 +88,42 @@ router.get("/token/ec", async (req, res) => {
   res.send({ token });
 });
 
+// router.get("/token/rsa/:userID", async (req, res) => {
+//   const { userID } = req.params;
+//   const ks = fs.readFileSync("keys_rsa.json");
+//   const keyStore = await jose.JWK.asKeyStore(ks.toString());
+//   const [key] = keyStore.all({ use: "sig" });
+//   console.log("key", key);
+//   const opt = { compact: true, jwk: key, fields: { typ: "jwt" } };
+//   const payload = JSON.stringify({
+//     sub: "123",
+//     aud: "urn:zerodev:client",
+//   });
+//   const token = await jose.JWS.createSign(opt, key).update(payload).final();
+//   res.send({ token });
+// });
+
 router.get("/token/rsa/:userID", async (req, res) => {
   const { userID } = req.params;
-  const ks = fs.readFileSync("keys_rsa.json"); // replace this with your JWKS endpoint in case of RSA
+  const ks = fs.readFileSync("keys_rsa.json");
   const keyStore = await jose.JWK.asKeyStore(ks.toString());
   const [key] = keyStore.all({ use: "sig" });
 
-  const opt = { compact: true, jwk: key, fields: { typ: "jwt" }, userID };
+  const opt = { compact: true, jwk: key, fields: { typ: "jwt" } };
   const payload = JSON.stringify({
     sub: "123",
     aud: "urn:zerodev:client",
+    userID,
+    timestamp: Date.now(), // Include a timestamp for uniqueness
   });
-  const token = await jose.JWS.createSign(opt, key).update(payload).final();
-  res.send({ token });
+
+  try {
+    const token = await jose.JWS.createSign(opt, key).update(payload).final();
+    res.send({ token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error generating token");
+  }
 });
 
 router.post("/verify/rsa", async (req, res) => {
